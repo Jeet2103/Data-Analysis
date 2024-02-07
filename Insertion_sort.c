@@ -9,7 +9,7 @@ int insertionSort(int arr[], int n) {
     for (int i = 1; i < n; ++i) {
         int key = arr[i];
         int j = i - 1;
-
+        comparisons++;
         while (j >= 0 && arr[j] > key) {
             arr[j + 1] = arr[j];
             j--;
@@ -17,6 +17,11 @@ int insertionSort(int arr[], int n) {
         }
 
         arr[j + 1] = key;
+        for(int j=0;j<n;j++)
+        {
+            printf("%d  ",arr[j]);
+        }
+        printf("\n");
     }
 
     return comparisons;
