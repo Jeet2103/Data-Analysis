@@ -30,16 +30,17 @@ long long compute_Xn_logarithmic(int X, int n) {
 
 int main() {
     // Example usage:
-    int X = 2;
-    int n = 10;
+    int x, n;
+    printf("Enter the value of X and N :\n");
+    scanf("%d%d",&x,&n);
 
     // O(n) time complexity
-    long long result_linear = compute_Xn_linear(X, n);
-    printf("%d^%d = %lld\n", X, n, result_linear);
+    long long result_linear = compute_Xn_linear(x, n);
+    printf("%d^%d = %lld\n", x, n, result_linear);
 
     // O(log n) time complexity
-    long long result_logarithmic = compute_Xn_logarithmic(X, n);
-    printf("%d^%d = %lld\n", X, n, result_logarithmic);
+    long long result_logarithmic = compute_Xn_logarithmic(x, n);
+    printf("%d^%d = %lld\n", x, n, result_logarithmic);
 
     return 0;
 }
