@@ -45,29 +45,29 @@ int main() {
 
     // i) Elements arranged in the desired order
     printf("Case i: Elements in desired order\n");
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < n; ++i) {
         arr_desired[i] = i + 1;
     }
-    printArray(arr_desired, 10);
+    printArray(arr_desired, n);
     int comparisons_desired = insertionSort(arr_desired, n);
     printf("Comparisons: %d\n\n", comparisons_desired);
 
     // ii) Elements arranged in completely reverse order
     printf("Case ii: Elements in completely reverse order\n");
-    for (int i = 0; i < 10; ++i) {
-        arr_reverse[i] = 10 - i;
+    for (int i = 0; i < n; ++i) {
+        arr_reverse[i] = n - i;
     }
-    printArray(arr_reverse, 10);
+    printArray(arr_reverse, n);
     int comparisons_reverse = insertionSort(arr_reverse, n);
     printf("Comparisons: %d\n\n", comparisons_reverse);
 
     // iii) Elements randomly generated
     printf("Case iii: Elements randomly generated\n");
     srand(time(NULL));
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < n; ++i) {
         arr_random[i] = rand() % 100; // assuming elements are within the range [0, 99]
     }
-    printArray(arr_random, 10);
+    printArray(arr_random, n);
     int comparisons_random = insertionSort(arr_random, n);
     printf("Comparisons: %d\n\n", comparisons_random);
 
