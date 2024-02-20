@@ -2,38 +2,33 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Function to perform the partition step of the quicksort algorithm
-int partition(int arr[], int low, int high, int pivotChoice) {
+int partition(int arr[], int low, int high, int pivotChoice, int* comparisons) {
     int pivot;
 
-    // Choose pivot based on the specified strategy
     switch (pivotChoice) {
-        case 1: // First element
+        case 1:
             pivot = arr[low];
             break;
-        case 2: // Middle element
-            pivot = arr[(low + high) / 2];
+        case 2:
+            pivot = arr[high];
             break;
-        case 3: // Random element
+        case 3:
             pivot = arr[low + rand() % (high - low + 1)];
             break;
-        default: // Default to last element
-            pivot = arr[high];
     }
 
     int i = (low - 1);
 
     for (int j = low; j <= high - 1; j++) {
+        (*comparisons)++; // Increment comparisons counter
         if (arr[j] < pivot) {
             i++;
-            // Swap arr[i] and arr[j]
             int temp = arr[i];
             arr[i] = arr[j];
             arr[j] = temp;
         }
     }
 
-    // Swap arr[i+1] and arr[high] (pivot)
     int temp = arr[i + 1];
     arr[i + 1] = arr[high];
     arr[high] = temp;
@@ -41,19 +36,15 @@ int partition(int arr[], int low, int high, int pivotChoice) {
     return (i + 1);
 }
 
-// Function to perform the quicksort algorithm
-void quicksort(int arr[], int low, int high, int pivotChoice) {
+void quicksort(int arr[], int low, int high, int pivotChoice, int* comparisons) {
     if (low < high) {
-        // Find the partitioning index
-        int pivotIndex = partition(arr, low, high, pivotChoice);
+        int pivotIndex = partition(arr, low, high, pivotChoice, comparisons);
 
-        // Recursively sort the sub-arrays
-        quicksort(arr, low, pivotIndex - 1, pivotChoice);
-        quicksort(arr, pivotIndex + 1, high, pivotChoice);
+        quicksort(arr, low, pivotIndex - 1, pivotChoice, comparisons);
+        quicksort(arr, pivotIndex + 1, high, pivotChoice, comparisons);
     }
 }
 
-// Function to estimate the number of comparisons for different pivots
 void estimateComparisons(int arr[], int size) {
     printf("Input size: %d\n", size);
 
@@ -66,10 +57,9 @@ void estimateComparisons(int arr[], int size) {
         int comparisons = 0;
         clock_t start, end;
         start = clock();
-        quicksort(arr_copy, 0, size - 1, pivotChoice);
+        quicksort(arr_copy, 0, size - 1, pivotChoice, &comparisons);
         end = clock();
-        comparisons = size - 1;
-
+        // printf("The size is : %d\n",size);
         printf("Using pivot choice %d:\n", pivotChoice);
         printf("Comparisons: %d\n", comparisons);
         printf("Time taken: %f seconds\n", ((double)end - start) / CLOCKS_PER_SEC);
@@ -79,20 +69,15 @@ void estimateComparisons(int arr[], int size) {
 }
 
 int main() {
-    // Seed for randomization
     srand(time(NULL));
-
-    // Set the input sizes
-    int sizes[] = {10000, 100000, 1000000};
+    int sizes[] = {10, 100000, 1000000};
 
     for (int i = 0; i < sizeof(sizes) / sizeof(sizes[0]); i++) {
-        // Generate random array for each input size
         int arr[sizes[i]];
         for (int j = 0; j < sizes[i]; j++) {
             arr[j] = rand();
         }
 
-        // Estimate the number of comparisons for different pivot choices
         estimateComparisons(arr, sizes[i]);
     }
 
