@@ -67,7 +67,7 @@ int main() {
     srand(time(NULL));
     
     // Define locally
-    int ARRAY_SIZE = 100;
+    int ARRAY_SIZE = 1000;
     int NUM_TESTS = 100000;
     
     int randomPermutation[ARRAY_SIZE];
