@@ -70,7 +70,7 @@ void estimateComparisons(int arr[], int size) {
 
 int main() {
     srand(time(NULL));
-    int sizes[] = {10, 100000, 1000000};
+    int sizes[] = {10000, 100000, 1000000};
 
     for (int i = 0; i < sizeof(sizes) / sizeof(sizes[0]); i++) {
         int arr[sizes[i]];
