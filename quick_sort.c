@@ -70,7 +70,9 @@ void printArray(int arr[], int size) {
 }
 
 int main() {
-    int size = 10;
+    int size ;
+    printf("Enter the size of the array : \n");
+    scanf("%d",&size);
     int arrAscending[size];
     int arrDescending[size];
     int arrRandom[size];
