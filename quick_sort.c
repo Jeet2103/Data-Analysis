@@ -1,85 +1,166 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-int partition(int arr[], int low, int high, int pivotChoice, int* comparisons) {
-    int pivot;
+// Function to swap two elements in an array
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
-    switch (pivotChoice) {
-        case 1:
-            pivot = arr[low];
-            break;
-        case 2:
-            pivot = arr[high];
-            break;
-        case 3:
-            pivot = arr[low + rand() % (high - low + 1)];
-            break;
-    }
+// Function to partition the array and return the pivot index
+int partition(int arr[], int low, int high, int* comparisons) {
+    int pivot = arr[high];
+    int i = low - 1;
 
-    int i = (low - 1);
+    for (int j = low; j < high; j++) {
+        (*comparisons)++; // Increment comparisons for each comparison made
 
-    for (int j = low; j <= high - 1; j++) {
-        (*comparisons)++; // Increment comparisons counter
-        if (arr[j] < pivot) {
+        if (arr[j] <= pivot) {
             i++;
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+            swap(&arr[i], &arr[j]);
         }
     }
 
-    int temp = arr[i + 1];
-    arr[i + 1] = arr[high];
-    arr[high] = temp;
+    swap(&arr[i + 1], &arr[high]);
 
-    return (i + 1);
+    return i + 1;
 }
 
-void quicksort(int arr[], int low, int high, int pivotChoice, int* comparisons) {
+// Function to implement QuickSort using the first element as the pivot
+void quickSortFirstPivot(int arr[], int low, int high, int* comparisons) {
     if (low < high) {
-        int pivotIndex = partition(arr, low, high, pivotChoice, comparisons);
+        int pivotIndex = partition(arr, low, high, comparisons);
 
-        quicksort(arr, low, pivotIndex - 1, pivotChoice, comparisons);
-        quicksort(arr, pivotIndex + 1, high, pivotChoice, comparisons);
+        quickSortFirstPivot(arr, low, pivotIndex - 1, comparisons);
+        quickSortFirstPivot(arr, pivotIndex + 1, high, comparisons);
     }
 }
 
-void estimateComparisons(int arr[], int size) {
-    printf("Input size: %d\n", size);
+// Function to implement QuickSort using the last element as the pivot
+void quickSortLastPivot(int arr[], int low, int high, int* comparisons) {
+    if (low < high) {
+        int pivotIndex = partition(arr, low, high, comparisons);
 
-    for (int pivotChoice = 1; pivotChoice <= 3; pivotChoice++) {
-        int arr_copy[size];
-        for (int i = 0; i < size; i++) {
-            arr_copy[i] = arr[i];
-        }
-
-        int comparisons = 0;
-        clock_t start, end;
-        start = clock();
-        quicksort(arr_copy, 0, size - 1, pivotChoice, &comparisons);
-        end = clock();
-        // printf("The size is : %d\n",size);
-        printf("Using pivot choice %d:\n", pivotChoice);
-        printf("Comparisons: %d\n", comparisons);
-        printf("Time taken: %f seconds\n", ((double)end - start) / CLOCKS_PER_SEC);
-
-        printf("\n");
+        quickSortLastPivot(arr, low, pivotIndex - 1, comparisons);
+        quickSortLastPivot(arr, pivotIndex + 1, high, comparisons);
     }
+}
+
+// Function to implement QuickSort using a randomly chosen element as the pivot
+void quickSortRandomPivot(int arr[], int low, int high, int* comparisons) {
+    if (low < high) {
+        // Choose a random index as the pivot
+        int randomIndex = low + rand() % (high - low + 1);
+        swap(&arr[randomIndex], &arr[high]);
+
+        int pivotIndex = partition(arr, low, high, comparisons);
+
+        quickSortRandomPivot(arr, low, pivotIndex - 1, comparisons);
+        quickSortRandomPivot(arr, pivotIndex + 1, high, comparisons);
+    }
+}
+
+// Function to print an array
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
 }
 
 int main() {
-    srand(time(NULL));
-    int sizes[] = {10000, 100000, 1000000};
+    int size = 10;
+    int arrAscending[size];
+    int arrDescending[size];
+    int arrRandom[size];
 
-    for (int i = 0; i < sizeof(sizes) / sizeof(sizes[0]); i++) {
-        int arr[sizes[i]];
-        for (int j = 0; j < sizes[i]; j++) {
-            arr[j] = rand();
-        }
-
-        estimateComparisons(arr, sizes[i]);
+    // Case 1: Array sorted in ascending order (1 to 10)
+    for (int i = 0; i < size; i++) {
+        arrAscending[i] = i + 1;
     }
+
+    // Case 2: Array sorted in descending order (10 to 1)
+    for (int i = 0; i < size; i++) {
+        arrDescending[i] = size - i;
+    }
+
+    // Case 3: Randomly generated array
+    for (int i = 0; i < size; i++) {
+        arrRandom[i] = rand() % 100; // Limiting values to ease readability
+    }
+
+    // Perform QuickSort for each case and each pivot choice
+
+    // Case 1: Array sorted in ascending order
+    printf("Original Array (Ascending Order): ");
+    printArray(arrAscending, size);
+
+    int comparisonsAscFirstPivot = 0;
+    quickSortFirstPivot(arrAscending, 0, size - 1, &comparisonsAscFirstPivot);
+    printf("Sorted Array (First Pivot): ");
+    printArray(arrAscending, size);
+    printf("Comparisons: %d\n", comparisonsAscFirstPivot);
+
+    int comparisonsAscLastPivot = 0;
+    quickSortLastPivot(arrAscending, 0, size - 1, &comparisonsAscLastPivot);
+    printf("Sorted Array (Last Pivot): ");
+    printArray(arrAscending, size);
+    printf("Comparisons: %d\n", comparisonsAscLastPivot);
+
+    int comparisonsAscRandomPivot = 0;
+    quickSortRandomPivot(arrAscending, 0, size - 1, &comparisonsAscRandomPivot);
+    printf("Sorted Array (Random Pivot): ");
+    printArray(arrAscending, size);
+    printf("Comparisons: %d\n", comparisonsAscRandomPivot);
+
+    printf("\n");
+
+    // Case 2: Array sorted in descending order
+    printf("Original Array (Descending Order): ");
+    printArray(arrDescending, size);
+
+    int comparisonsDescFirstPivot = 0;
+    quickSortFirstPivot(arrDescending, 0, size - 1, &comparisonsDescFirstPivot);
+    printf("Sorted Array (First Pivot): ");
+    printArray(arrDescending, size);
+    printf("Comparisons: %d\n", comparisonsDescFirstPivot);
+
+    int comparisonsDescLastPivot = 0;
+    quickSortLastPivot(arrDescending, 0, size - 1, &comparisonsDescLastPivot);
+    printf("Sorted Array (Last Pivot): ");
+    printArray(arrDescending, size);
+    printf("Comparisons: %d\n", comparisonsDescLastPivot);
+
+    int comparisonsDescRandomPivot = 0;
+    quickSortRandomPivot(arrDescending, 0, size - 1, &comparisonsDescRandomPivot);
+    printf("Sorted Array (Random Pivot): ");
+    printArray(arrDescending, size);
+    printf("Comparisons: %d\n", comparisonsDescRandomPivot);
+
+    printf("\n");
+
+    // Case 3: Randomly generated array
+    printf("Original Array (Randomly Generated): ");
+    printArray(arrRandom, size);
+
+    int comparisonsRandomFirstPivot = 0;
+    quickSortFirstPivot(arrRandom, 0, size - 1, &comparisonsRandomFirstPivot);
+    printf("Sorted Array (First Pivot): ");
+    printArray(arrRandom, size);
+    printf("Comparisons: %d\n", comparisonsRandomFirstPivot);
+
+    int comparisonsRandomLastPivot = 0;
+    quickSortLastPivot(arrRandom, 0, size - 1, &comparisonsRandomLastPivot);
+    printf("Sorted Array (Last Pivot): ");
+    printArray(arrRandom, size);
+    printf("Comparisons: %d\n", comparisonsRandomLastPivot);
+
+    int comparisonsRandomRandomPivot = 0;
+    quickSortRandomPivot(arrRandom, 0, size - 1, &comparisonsRandomRandomPivot);
+    printf("Sorted Array (Random Pivot): ");
+    printArray(arrRandom, size);
+    printf("Comparisons: %d\n", comparisonsRandomRandomPivot);
 
     return 0;
 }
