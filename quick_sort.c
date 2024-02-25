@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 
 // Function to swap two elements in an array
 void swap(int* a, int* b) {
@@ -51,6 +53,7 @@ void quickSortLastPivot(int arr[], int low, int high, int* comparisons) {
 void quickSortRandomPivot(int arr[], int low, int high, int* comparisons) {
     if (low < high) {
         // Choose a random index as the pivot
+        srand(time(NULL));
         int randomIndex = low + rand() % (high - low + 1);
         swap(&arr[randomIndex], &arr[high]);
 
@@ -76,6 +79,7 @@ int main() {
     int arrAscending[size];
     int arrDescending[size];
     int arrRandom[size];
+    srand(time(NULL));
 
     // Case 1: Array sorted in ascending order (1 to 10)
     for (int i = 0; i < size; i++) {
