@@ -2,91 +2,91 @@
 #include <stdlib.h>
 #include <time.h>
 
-void swap(int *a, int *b) {
+// Function to swap two elements
+void swap(int* a, int* b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-int partition(int arr[], int low, int high) {
-    int pivotIndex = low + rand() % (high - low + 1);
-    int pivotValue = arr[pivotIndex];
-    swap(&arr[pivotIndex], &arr[high]);
-    
-    int i = low - 1;
-    
-    for (int j = low; j < high; j++) {
-        if (arr[j] <= pivotValue) {
+// Function to generate a random permutation of the first n natural numbers
+void Generate_random_sequence(int n) {
+    int *arr = (int *)malloc(n * sizeof(int));
+    FILE *fp = fopen("unsorted_seq.txt", "w");
+    if (fp == NULL) {
+        printf("Error opening file.\n");
+        exit(1);
+    }
+
+    // Generate the sequence
+    for (int i = 0; i < n; i++)
+        arr[i] = i + 1;
+
+    // Shuffle the sequence
+    srand(time(NULL));
+    for (int i = n - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        swap(&arr[i], &arr[j]);
+    }
+
+    // Write the shuffled sequence to the file
+    for (int i = 0; i < n; i++)
+        fprintf(fp, "%d ", arr[i]);
+
+    fclose(fp);
+    free(arr);
+}
+
+// Randomized Partition function for QuickSort
+int randomized_partition(int arr[], int left, int right) {
+    srand(time(NULL));
+    int random = left + rand() % (right - left + 1); // Random pivot index
+    swap(&arr[random], &arr[right]); // Swap random pivot with the last element
+
+    int pivot = arr[right]; // Pivot element
+    int i = left - 1;
+
+    for (int j = left; j < right; j++) {
+        if (arr[j] <= pivot) {
             i++;
             swap(&arr[i], &arr[j]);
         }
     }
-    
-    swap(&arr[i + 1], &arr[high]);
+    swap(&arr[i + 1], &arr[right]);
     return i + 1;
 }
 
-void quickSort(int arr[], int low, int high) {
-    if (low < high) {
-        int pivotIndex = partition(arr, low, high);
-        quickSort(arr, low, pivotIndex - 1);
-        quickSort(arr, pivotIndex + 1, high);
-    }
-}
-
-void randomizedQuickSort(int arr[], int low, int high) {
-    if (low < high) {
-        int pivotIndex = partition(arr, low, high);
-        randomizedQuickSort(arr, low, pivotIndex - 1);
-        randomizedQuickSort(arr, pivotIndex + 1, high);
-    }
-}
-
-double measureTime(void (*sortingAlgorithm)(int[], int, int), int arr[], int arraySize) {
-    clock_t start, end;
-    start = clock();
-    
-    sortingAlgorithm(arr, 0, arraySize - 1);
-    
-    end = clock();
-    return ((double)(end - start)) / CLOCKS_PER_SEC;
-}
-
-void generateRandomPermutation(int arr[], int arraySize) {
-    for (int i = 0; i < arraySize; i++) {
-        arr[i] = i;
-    }
-    
-    for (int i = arraySize - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        swap(&arr[i], &arr[j]);
+// Randomized QuickSort function
+void Randomized_quick_sort(int arr[], int left, int right) {
+    if (left < right) {
+        int pi = randomized_partition(arr, left, right); // Partitioning index
+        Randomized_quick_sort(arr, left, pi - 1);
+        Randomized_quick_sort(arr, pi + 1, right);
     }
 }
 
 int main() {
-    srand(time(NULL));
-    
-    // Define locally
-    int ARRAY_SIZE = 1000;
-    int NUM_TESTS = 100000;
-    
-    int randomPermutation[ARRAY_SIZE];
-    
-    double averageTimeQuickSort = 0.0;
-    double averageTimeRandomizedQuickSort = 0.0;
-    
-    for (int i = 0; i < NUM_TESTS; i++) {
-        generateRandomPermutation(randomPermutation, ARRAY_SIZE);
-        
-        averageTimeQuickSort += measureTime(quickSort, randomPermutation, ARRAY_SIZE);
-        averageTimeRandomizedQuickSort += measureTime(randomizedQuickSort, randomPermutation, ARRAY_SIZE);
+    int n = 1000;
+    Generate_random_sequence(n);
+    printf("Random permutation of first %d natural numbers generated and stored in unsorted_seq.txt.\n", n);
+    FILE *fp = fopen("unsorted_seq.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening file.\n");
+        exit(1);
     }
-    
-    averageTimeQuickSort /= NUM_TESTS;
-    averageTimeRandomizedQuickSort /= NUM_TESTS;
-    
-    printf("Average running time for QuickSort: %f seconds\n", averageTimeQuickSort);
-    printf("Average running time for Randomized QuickSort: %f seconds\n", averageTimeRandomizedQuickSort);
-    
+
+    int *arr = (int *)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++)
+        fscanf(fp, "%d", &arr[i]);
+    fclose(fp);
+
+    Randomized_quick_sort(arr, 0, n - 1);
+
+    printf("Sorted sequence: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    free(arr);
     return 0;
 }
