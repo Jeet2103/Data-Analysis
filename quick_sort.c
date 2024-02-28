@@ -42,6 +42,7 @@ void quickSortFirstPivot(int arr[], int low, int high, int* comparisons) {
 // Function to implement QuickSort using the last element as the pivot
 void quickSortLastPivot(int arr[], int low, int high, int* comparisons) {
     if (low < high) {
+        swap(&arr[high], &arr[low]);
         int pivotIndex = partition(arr, low, high, comparisons);
 
         quickSortLastPivot(arr, low, pivotIndex - 1, comparisons);
@@ -74,7 +75,7 @@ void printArray(int arr[], int size) {
 
 int main() {
     int size ;
-    printf("Enter the size of the array : \n");
+    printf("Enter the size of  array : \n");
     scanf("%d",&size);
     int arrAscending[size];
     int arrDescending[size];
