@@ -100,14 +100,14 @@ int main() {
     // Perform QuickSort for each case and each pivot choice
 
     // Case 1: Array sorted in ascending order
-    printf("Original Array (Ascending Order): ");
+    printf("Original Array (Ascending Order) is : ");
     printArray(arrAscending, size);
 
     int comparisonsAscFirstPivot = 0;
     quickSortFirstPivot(arrAscending, 0, size - 1, &comparisonsAscFirstPivot);
-    printf("Sorted Array (First Pivot): ");
+    printf("Sorted Array (First Pivot) is : ");
     printArray(arrAscending, size);
-    printf("Comparisons: %d\n", comparisonsAscFirstPivot);
+    printf("Comparisons is : %d\n", comparisonsAscFirstPivot);
 
     int comparisonsAscLastPivot = 0;
     quickSortLastPivot(arrAscending, 0, size - 1, &comparisonsAscLastPivot);
