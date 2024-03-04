@@ -126,7 +126,7 @@ int main()
     fptr4 = fopen("of.txt", "w");
     while(fscanf(fptr2_random, "%d",&a[0])!=EOF)
     {
-        for(i=1;i,n;i++)
+        for(i=1;i<n;i++)
         {
             fscanf(fptr2_random,"%d",&a[i]);
         }
@@ -135,7 +135,7 @@ int main()
     }
     while(fscanf(fptr2_fixed, "%d",&a[0])!=EOF)
     {
-        for(i=1;i,n;i++)
+        for(i=1;i<n;i++)
         {
             fscanf(fptr2_fixed,"%d",&a[i]);
         }
