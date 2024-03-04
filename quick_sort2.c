@@ -1,92 +1,156 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
 
-// Function to swap two elements
-void swap(int* a, int* b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
+void print(int *arr, int n)
+{
+    int i;
+    for(i=0;i<n;i++)
+    {
+        printf("%d\t",arr[i]);
+    }
+    printf("\n");
 }
 
-// Function to generate a random permutation of the first n natural numbers
-void Generate_random_sequence(int n) {
-    int *arr = (int *)malloc(n * sizeof(int));
-    FILE *fp = fopen("unsorted_seq.txt", "w");
-    if (fp == NULL) {
-        printf("Error opening file.\n");
-        exit(1);
+void insert_file(FILE *fp, int *a , int n)
+{
+    int i;
+    for(i=0;i<n;i++)
+    {
+        fprintf(fp,"%d\t",a[i]);
     }
-
-    // Generate the sequence
-    for (int i = 0; i < n; i++)
-        arr[i] = i + 1;
-
-    // Shuffle the sequence
-    srand(time(NULL));
-    for (int i = n - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        swap(&arr[i], &arr[j]);
-    }
-
-    // Write the shuffled sequence to the file
-    for (int i = 0; i < n; i++)
-        fprintf(fp, "%d ", arr[i]);
-
-    fclose(fp);
-    free(arr);
+    fprintf(fp,"\n");
+}
+void swap(int *a, int *b)
+{
+    int temp=*a ;
+    *a=*b;
+    *b= temp;
 }
 
-// Randomized Partition function for QuickSort
-int randomized_partition(int arr[], int left, int right) {
-    srand(time(NULL));
-    int random = left + rand() % (right - left + 1); // Random pivot index
-    swap(&arr[random], &arr[right]); // Swap random pivot with the last element
-
-    int pivot = arr[right]; // Pivot element
-    int i = left - 1;
-
-    for (int j = left; j < right; j++) {
-        if (arr[j] <= pivot) {
+int partition_lp(int *arr, int p, int q, double *c)
+{
+    int x = arr[p], i =p, j;
+    for(j=p+1;j<=q;j++)
+    {
+        (*c)++;
+        if(arr[j]<=x)
+        {
             i++;
-            swap(&arr[i], &arr[j]);
+            swap(&arr[i],&arr[j]);
         }
     }
-    swap(&arr[i + 1], &arr[right]);
-    return i + 1;
+    swap(&arr[i],&arr[p]);
+    return i;
 }
 
-// Randomized QuickSort function
-void Randomized_quick_sort(int arr[], int left, int right) {
-    if (left < right) {
-        int pi = randomized_partition(arr, left, right); // Partitioning index
-        Randomized_quick_sort(arr, left, pi - 1);
-        Randomized_quick_sort(arr, pi + 1, right);
+int random_part(int *arr, int p , int r, double*c)
+{
+    int i = rand()%(r-p+1)+p;
+    swap(&arr[r], &arr[i]);
+    return partition_lp(arr,p,r,c);
+}
+
+void random_qs(int *arr, int p , int r, double *c)
+{
+    if(p<r)
+    {
+        int q = random_part(arr,p,r,c);
+        random_qs(arr,p,q-1,c);
+        random_qs(arr,q+1,r,c);
     }
 }
 
-int main() {
-    int n = 1000;
-    Generate_random_sequence(n);
-    printf("Random permutation of first %d natural numbers generated and stored in unsorted_seq.txt.\n", n);
-    FILE *fp = fopen("unsorted_seq.txt", "r");
-    if (fp == NULL) {
-        printf("Error opening file.\n");
-        exit(1);
+ void permute(FILE *fp, int *a, int n, int index)
+ {
+    int i;
+    if(index==n-1)
+    {
+       insert_file(fp,a,n);
+       return; 
     }
+    for(i= index; i<n;i++)
+    {
+        swap(&a[index],&a[i]);
+        permute(fp,a,n,index+1);
+        swap(&a[index],&a[i]);
+    }
+ }
 
-    int *arr = (int *)malloc(n * sizeof(int));
-    for (int i = 0; i < n; i++)
-        fscanf(fp, "%d", &arr[i]);
-    fclose(fp);
+ void quicksort_lp(int *arr, int p, int r, double *c)
+ {
+    if(p<r)
+    {
+        int q = random_part(arr,p,r,c);
+        quicksort_lp(arr,p,q-1,c);
+        quicksort_lp(arr,q+1,r,c);
+    }
+}
 
-    Randomized_quick_sort(arr, 0, n - 1);
+double fact(int n)
+{
+    int i;
+    double r =1;
+    for(i=1;i<=n; i++)
+    {
+        r*=i;
+    }
+    return r;
+}
 
-    printf("Sorted sequence: ");
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
+int main()
+{
+    srand(time(NULL));
+    FILE *fptr1, *fptr2_random, *fptr2_fixed, *fptr3, *fptr4;
+    int n, i, *a;
+    double r=0, f=0;
+    printf("Enter the Number of inputs : \n");
+    scanf("%d",&n);
+    a = (int *) malloc(n*sizeof(int));
+    for(i=0;i<n;i++)
+    {
+        a[i]=i;
+    }
+    fptr1 = fopen("p.txt","w");
+    if(fptr1!=NULL)
+    {
+        permute(fptr1, a, n,0);
+    }
+    else
+    {
+        printf("File Does not exist");
+    }
+    fptr2_random = fopen("p.txt", "r");
+    fptr2_fixed = fopen("p.txt", "r");
+    fptr3 = fopen("or.txt","w");
+    fptr4 = fopen("of.txt", "w");
+    while(fscanf(fptr2_random, "%d",&a[0])!=EOF)
+    {
+        for(i=1;i,n;i++)
+        {
+            fscanf(fptr2_random,"%d",&a[i]);
+        }
+        random_qs(a,0,n-1,&r);
+        insert_file(fptr3, a , n);  
+    }
+    while(fscanf(fptr2_fixed, "%d",&a[0])!=EOF)
+    {
+        for(i=1;i,n;i++)
+        {
+            fscanf(fptr2_fixed,"%d",&a[i]);
+        }
+        quicksort_lp(a,0,n-1,&f);
+        insert_file(fptr4, a , n);  
+    }
+    fclose(fptr2_random);
+    fclose(fptr2_fixed);
+    fclose(fptr3);
+    fclose(fptr4);
+    printf("Average number of comparisons for randomized : %lf\n",r/fact(n));
+    printf("Average number of comparisons for fixed : %lf\n",f/fact(n));
 
-    free(arr);
     return 0;
+    
+
 }
+
