@@ -179,24 +179,44 @@ void dijkstra(Graph* graph, int src)
     printArr(dist, V);
     free(dist);
 }
-int main()
-{
-    int V = 9;
+int main() {
+    int V, E, src;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+
     Graph* graph = createGraph(V);
-    addEdge(graph, 0, 1, 4);
-    addEdge(graph, 0, 7, 8);
-    addEdge(graph, 1, 2, 8);
-    addEdge(graph, 1, 7, 11);
-    addEdge(graph, 2, 3, 7);
-    addEdge(graph, 2, 8, 2);
-    addEdge(graph, 2, 5, 4);
-    addEdge(graph, 3, 4, 9);
-    addEdge(graph, 3, 5, 14);
-    addEdge(graph, 4, 5, 10);
-    addEdge(graph, 5, 6, 2);
-    addEdge(graph, 6, 7, 1);
-    addEdge(graph, 6, 8, 6);
-    addEdge(graph, 7, 8, 7);
-    dijkstra(graph, 0);
+
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+
+    printf("Enter edges (source destination weight):\n");
+    for (int i = 0; i < E; ++i) {
+        int src, dest, weight;
+        scanf("%d %d %d", &src, &dest, &weight);
+        addEdge(graph, src, dest, weight);
+    }
+
+    printf("Enter the source vertex: ");
+    scanf("%d", &src);
+
+    dijkstra(graph, src);
+
     return 0;
 }
+    // int V = 9;
+    // Graph* graph = createGraph(V);
+    // addEdge(graph, 0, 1, 4);
+    // addEdge(graph, 0, 7, 8);
+    // addEdge(graph, 1, 2, 8);
+    // addEdge(graph, 1, 7, 11);
+    // addEdge(graph, 2, 3, 7);
+    // addEdge(graph, 2, 8, 2);
+    // addEdge(graph, 2, 5, 4);
+    // addEdge(graph, 3, 4, 9);
+    // addEdge(graph, 3, 5, 14);
+    // addEdge(graph, 4, 5, 10);
+    // addEdge(graph, 5, 6, 2);
+    // addEdge(graph, 6, 7, 1);
+    // addEdge(graph, 6, 8, 6);
+    // addEdge(graph, 7, 8, 7);
+    // dijkstra(graph, 0);
