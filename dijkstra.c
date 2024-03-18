@@ -10,22 +10,22 @@ typedef struct Edge {
     struct Edge* next;
 } Edge;
 
-typedef struct {
+typedef struct Node {
     int id;
     Edge* edges;
 } Node;
 
-typedef struct {
+typedef struct Graph {
     int numNodes;
     Node* nodes;
 } Graph;
 
-typedef struct {
+typedef struct HeapNode {
     int vertex;
     int distance;
 } HeapNode;
 
-typedef struct {
+typedef struct MinHeap {
     int size;
     int capacity;
     int* pos;
@@ -33,9 +33,9 @@ typedef struct {
 } MinHeap;
 
 Graph* createGraph(int numNodes) {
-    Graph* graph = malloc(sizeof(Graph));
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
     graph->numNodes = numNodes;
-    graph->nodes = malloc(numNodes * sizeof(Node));
+    graph->nodes = (Node*)malloc(numNodes * sizeof(Node));
     for (int i = 0; i < numNodes; ++i) {
         graph->nodes[i].id = i;
         graph->nodes[i].edges = NULL;
@@ -44,7 +44,7 @@ Graph* createGraph(int numNodes) {
 }
 
 void addEdge(Graph* graph, int src, int dest, int weight) {
-    Edge* edge = malloc(sizeof(Edge));
+    Edge* edge = (Edge*)malloc(sizeof(Edge));
     edge->dest = dest;
     edge->weight = weight;
     edge->next = graph->nodes[src].edges;
@@ -52,18 +52,18 @@ void addEdge(Graph* graph, int src, int dest, int weight) {
 }
 
 HeapNode* createHeapNode(int vertex, int distance) {
-    HeapNode* newNode = malloc(sizeof(HeapNode));
+    HeapNode* newNode = (HeapNode*)malloc(sizeof(HeapNode));
     newNode->vertex = vertex;
     newNode->distance = distance;
     return newNode;
 }
 
 MinHeap* createMinHeap(int capacity) {
-    MinHeap* minHeap = malloc(sizeof(MinHeap));
-    minHeap->pos = malloc(capacity * sizeof(int));
+    MinHeap* minHeap = (MinHeap*)malloc(sizeof(MinHeap));
+    minHeap->pos = (int*)malloc(capacity * sizeof(int));
     minHeap->size = 0;
     minHeap->capacity = capacity;
-    minHeap->array = malloc(capacity * sizeof(HeapNode*));
+    minHeap->array = (HeapNode**)malloc(capacity * sizeof(HeapNode*));
     return minHeap;
 }
 
@@ -74,7 +74,9 @@ void swapHeapNodes(HeapNode** a, HeapNode** b) {
 }
 
 void minHeapify(MinHeap* minHeap, int idx) {
-    int smallest = idx, left = 2 * idx + 1, right = 2 * idx + 2;
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
     if (left < minHeap->size && minHeap->array[left]->distance < minHeap->array[smallest]->distance)
         smallest = left;
     if (right < minHeap->size && minHeap->array[right]->distance < minHeap->array[smallest]->distance)
@@ -94,12 +96,14 @@ int isEmpty(MinHeap* minHeap) {
 }
 
 HeapNode* extractMin(MinHeap* minHeap) {
-    if (isEmpty(minHeap)) return NULL;
+    if (isEmpty(minHeap))
+        return NULL;
     HeapNode* root = minHeap->array[0];
-    HeapNode* lastNode = minHeap->array[--minHeap->size];
+    HeapNode* lastNode = minHeap->array[minHeap->size - 1];
     minHeap->array[0] = lastNode;
-    minHeap->pos[root->vertex] = minHeap->size;
+    minHeap->pos[root->vertex] = minHeap->size - 1;
     minHeap->pos[lastNode->vertex] = 0;
+    --minHeap->size;
     minHeapify(minHeap, 0);
     return root;
 }
@@ -129,11 +133,13 @@ void printSolution(int dist[], int n, int parent[]) {
 }
 
 void dijkstra(Graph* graph, int src) {
-    int V = graph->numNodes, dist[V], parent[V];
+    int V = graph->numNodes;
+    int dist[V];
+    int parent[V]; // To store the parent node for each vertex in the shortest path
     MinHeap* minHeap = createMinHeap(V);
     for (int v = 0; v < V; ++v) {
         dist[v] = INT_MAX;
-        parent[v] = -1;
+        parent[v] = -1; // Initialize parent array with -1
         minHeap->array[v] = createHeapNode(v, dist[v]);
         minHeap->pos[v] = v;
     }
@@ -150,7 +156,7 @@ void dijkstra(Graph* graph, int src) {
             int v = pCrawl->dest;
             if (dist[u] != INT_MAX && pCrawl->weight + dist[u] < dist[v]) {
                 dist[v] = dist[u] + pCrawl->weight;
-                parent[v] = u;
+                parent[v] = u; // Update parent for vertex v
                 decreaseDistance(minHeap, v, dist[v]);
             }
             pCrawl = pCrawl->next;
@@ -161,7 +167,7 @@ void dijkstra(Graph* graph, int src) {
 
 int main() {
     FILE* fp = fopen("graph_input.txt", "r");
-    if (!fp) {
+    if (fp == NULL) {
         printf("Error opening file.\n");
         return 1;
     }

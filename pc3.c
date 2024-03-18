@@ -15,13 +15,34 @@ MinPriorityQueue* create(int capacity) {
     return pq;
 }
 
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void heapify(MinPriorityQueue* pq, int i) {
+    int smallest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < pq->size && pq->heap[left] < pq->heap[smallest])
+        smallest = left;
+
+    if (right < pq->size && pq->heap[right] < pq->heap[smallest])
+        smallest = right;
+
+    if (smallest != i) {
+        swap(&pq->heap[i], &pq->heap[smallest]);
+        heapify(pq, smallest);
+    }
+}
+
 void insert(MinPriorityQueue* pq, int value) {
     pq->heap[pq->size++] = value;
     int i = pq->size - 1;
     while (i > 0 && pq->heap[i] < pq->heap[(i - 1) / 2]) {
-        int temp = pq->heap[i];
-        pq->heap[i] = pq->heap[(i - 1) / 2];
-        pq->heap[(i - 1) / 2] = temp;
+        swap(&pq->heap[i], &pq->heap[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
 }
@@ -30,22 +51,7 @@ int deleteMin(MinPriorityQueue* pq) {
     if (pq->size == 0) return -1;
     int min = pq->heap[0];
     pq->heap[0] = pq->heap[--pq->size];
-    int i = 0;
-    while (1) {
-        int left = 2 * i + 1;
-        int right = 2 * i + 2;
-        int smallest = i;
-        if (left < pq->size && pq->heap[left] < pq->heap[smallest]) smallest = left;
-        if (right < pq->size && pq->heap[right] < pq->heap[smallest]) smallest = right;
-        if (smallest != i) {
-            int temp = pq->heap[i];
-            pq->heap[i] = pq->heap[smallest];
-            pq->heap[smallest] = temp;
-            i = smallest;
-        } else {
-            break;
-        }
-    }
+    heapify(pq, 0);
     return min;
 }
 
@@ -54,26 +60,10 @@ void update(MinPriorityQueue* pq, int old_val, int new_val) {
         if (pq->heap[i] == old_val) {
             pq->heap[i] = new_val;
             while (i > 0 && pq->heap[i] < pq->heap[(i - 1) / 2]) {
-                int temp = pq->heap[i];
-                pq->heap[i] = pq->heap[(i - 1) / 2];
-                pq->heap[(i - 1) / 2] = temp;
+                swap(&pq->heap[i], &pq->heap[(i - 1) / 2]);
                 i = (i - 1) / 2;
             }
-            while (1) {
-                int left = 2 * i + 1;
-                int right = 2 * i + 2;
-                int smallest = i;
-                if (left < pq->size && pq->heap[left] < pq->heap[smallest]) smallest = left;
-                if (right < pq->size && pq->heap[right] < pq->heap[smallest]) smallest = right;
-                if (smallest != i) {
-                    int temp = pq->heap[i];
-                    pq->heap[i] = pq->heap[smallest];
-                    pq->heap[smallest] = temp;
-                    i = smallest;
-                } else {
-                    break;
-                }
-            }
+            heapify(pq, i);
             return;
         }
     }
