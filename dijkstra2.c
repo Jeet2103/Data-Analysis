@@ -9,12 +9,12 @@ typedef struct AdjListNode
 }AdjListNode;
 typedef struct AdjList
 {
-   struct AdjListNode *head; 
+   AdjListNode *head; 
 }AdjList;
 typedef struct Graph
 {
     int V;
-    struct AdjList* array;
+    AdjList* array;
 }Graph;
 typedef struct MinHeapNode
 {
@@ -26,7 +26,7 @@ typedef struct MinHeap
     int size;     
     int capacity;  
     int *pos;    
-    struct MinHeapNode **array;
+    MinHeapNode **array;
 }MinHeap;
 AdjListNode* newAdjListNode(int dest, int weight)
 {
@@ -51,9 +51,6 @@ void addEdge(Graph* graph, int src,int dest, int weight)
     AdjListNode*newNode=newAdjListNode(dest, weight);
     newNode->next = graph->array[src].head;
     graph->array[src].head = newNode;
-    newNode = newAdjListNode(src, weight);
-    newNode->next = graph->array[dest].head;
-    graph->array[dest].head = newNode;
 }
 MinHeapNode* newMinHeapNode(int v,int dist)
 {
@@ -98,7 +95,7 @@ void minHeapify(MinHeap* minHeap,int idx)
         minHeapify(minHeap, smallest);
     }
 }
-int isEmpty(struct MinHeap* minHeap)
+int isEmpty(MinHeap* minHeap)
 {
     return minHeap->size == 0;
 }
@@ -141,9 +138,9 @@ void printArr(int dist[], int n)
     for (i = 0; i < n; ++i)
         printf("%d \t\t %d\n", i, dist[i]);
 }
-void dijkstra(Graph* graph, int src)
+void dijkstra(Graph* graph, int src,int*parent)
 {
-    int V = graph->V,v;
+    int V = graph->V,v,u;
     int *dist;     
     MinHeap* minHeap = createMinHeap(V);
     MinHeapNode*minHeapNode;
@@ -163,7 +160,7 @@ void dijkstra(Graph* graph, int src)
     while (!isEmpty(minHeap))
     {
         minHeapNode=extractMin(minHeap);
-        int u = minHeapNode->v; 
+        u = minHeapNode->v; 
         pCrawl=graph->array[u].head;
         while (pCrawl != NULL)
         {
@@ -172,6 +169,7 @@ void dijkstra(Graph* graph, int src)
             {
                 dist[v] = dist[u] + pCrawl->weight;
                 decreaseKey(minHeap, v, dist[v]);
+                parent[v]=u;
             }
             pCrawl = pCrawl->next;
         }
@@ -179,45 +177,59 @@ void dijkstra(Graph* graph, int src)
     printArr(dist, V);
     free(dist);
 }
-int main() {
-    // int V, E, src;
-    // printf("Enter the number of vertices: ");
-    // scanf("%d", &V);
-
-    // Graph* graph = createGraph(V);
-
-    // printf("Enter the number of edges: ");
-    // scanf("%d", &E);
-
-    // printf("Enter edges (source destination weight):\n");
-    // for (int i = 0; i < E; ++i) {
-    //     int src, dest, weight;
-    //     scanf("%d %d %d", &src, &dest, &weight);
-    //     addEdge(graph, src, dest, weight);
-    // }
-
-    // printf("Enter the source vertex: ");
-    // scanf("%d", &src);
-
-    // dijkstra(graph, src);
-
-
-    int V = 9;
-    Graph* graph = createGraph(V);
-    addEdge(graph, 0, 1, 4);
-    addEdge(graph, 0, 7, 8);
-    addEdge(graph, 1, 2, 8);
-    addEdge(graph, 1, 7, 11);
-    addEdge(graph, 2, 3, 7);
-    addEdge(graph, 2, 8, 2);
-    addEdge(graph, 2, 5, 4);
-    addEdge(graph, 3, 4, 9);
-    addEdge(graph, 3, 5, 14);
-    addEdge(graph, 4, 5, 10);
-    addEdge(graph, 5, 6, 2);
-    addEdge(graph, 6, 7, 1);
-    addEdge(graph, 6, 8, 6);
-    addEdge(graph, 7, 8, 7);
-    dijkstra(graph, 0);
+void print(Graph*graph)
+{
+    int i;
+    AdjListNode*ptr;
+    for(i=0;i<graph->V;i++)
+    {
+        ptr=graph->array[i].head;
+        printf("%d->",i);
+        while(ptr)
+        {
+            printf("%d->",ptr->dest);
+            ptr=ptr->next;
+        }
+        printf("NULL\n");
+    }
+}
+int main()
+{
+    FILE*fp;
+    Graph*graph;
+    int V,v1,v2,wt,i,val;
+    int*parent,*arr,top,src=0;
+    fp=fopen("graph_input.txt","r");
+    fscanf(fp,"%d",&V);
+    graph = createGraph(V);
+    parent=(int*)malloc(V*sizeof(int));
+    arr=(int*)malloc(V*sizeof(int));
+    while(fscanf(fp,"%d%d%d",&v1,&v2,&wt)!=EOF)
+    addEdge(graph,v1,v2,wt);
+    printf("Graph\n");
+    print(graph);
+    for(i=0;i<V;i++)
+    parent[i]=-1;
+    dijkstra(graph,src,parent);
+    printf("Paths\n");
+    for(i=0;i<V;i++)
+    {
+        top=0;
+        arr[top++]=i;
+        val=parent[i];
+        while(val!=-1)
+        {
+            arr[top++]=val;
+            val=parent[val];
+        }
+        top--;
+        while(top>-1){
+        if(top>0)
+        printf("%d->",arr[top--]);
+        else
+        printf("%d",arr[top--]);
+        }
+        printf("\n");
+    }
     return 0;
 }
